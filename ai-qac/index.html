@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI出题打卡</title>
+    <link rel="stylesheet" href="qac.css">
+</head>
+<body>
+    <div class="global-header">
+        <div class="stats" id="completedCount">0</div>
+        <button id="syncButton" class="nav-button" style="display:none;" onclick="syncData()">同步数据</button>
+        <div class="nav-buttons">
+            <button class="nav-button" onclick="showView('calendar')">日历</button>
+            <button class="nav-button" onclick="showView('tasks')">任务</button>
+            <button class="nav-button" onclick="showView('settings')">设置</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- 日历视图 -->
+        <div id="calendarView">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button class="nav-button" onclick="changeMonth(-1)">←</button>
+                    <h2 id="currentMonth"></h2>
+                    <button class="nav-button" onclick="changeMonth(1)">→</button>
+                </div>
+                <div class="calendar-grid" id="weekdayLabels"></div>
+                <div class="calendar-grid" id="calendar"></div>
+            </div>
+            <div id="storageWarning" class="storage-warning hidden">
+                警告：存储空间不足，已自动清理部分历史数据。
+            </div>
+        </div>
+
+        <!-- 任务列表视图 -->
+        <div id="tasksView" class="hidden">
+            <div class="task-list" id="taskList"></div>
+        </div>
+
+        <!-- 设置视图 -->
+		<div id="settingsView" class="hidden settings-page">
+			<div id="passwordProtection">
+				<h3>访问设置</h3>
+				<div class="form-group">
+					<label>密码：</label>
+					<input type="password" id="settingsPassword" class="form-control">
+				</div>
+				<button class="nav-button" onclick="verifyPassword()">验证</button>
+			</div>
+			
+			<div id="settingsContent" class="hidden">
+				<h2>系统设置</h2>
+				<div class="form-group">
+					<label>API 模型：</label>
+					<select id="apiModel" class="form-control" onchange="updateApiUrlBasedOnModel(this.value)">
+						<option value="deepseek-chat">DeepSeek Chat</option>
+						<option value="qwen-max">Qwen Max (阿里云)</option>
+						<option value="gpt-3.5-turbo">GPT-3.5 Turbo (OpenAI)</option>
+						<option value="gpt-4">GPT-4 (OpenAI)</option>
+						<option value="custom">自定义</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>API 地址：</label>
+					<input type="text" id="apiUrl" class="form-control" placeholder="请输入 OpenAI API 地址">
+				</div>
+				<div class="form-group">
+					<label>API 密钥：</label>
+					<input type="password" id="apiKey" class="form-control" placeholder="请输入 API 密钥">
+				</div>
+				<div class="form-group">
+					<label>Prompt 提示词：</label>
+					<textarea id="apiPrompt" class="form-control" rows="4" placeholder="请输入生成题目的提示词"></textarea>
+				</div>
+				<div class="form-group">
+					<label>数据同步 URL：</label>
+					<input type="text" id="syncUrl" class="form-control" placeholder="请输入数据同步服务器地址">
+				</div>
+				<div class="form-group">
+					<label>Debug 模式：</label>
+					<input type="checkbox" id="debugMode">
+				</div>
+				<button class="nav-button" onclick="saveSettings()">保存设置</button>
+				
+				<h3 style="margin-top:20px;">数据管理</h3>
+				<button class="nav-button" onclick="downloadData()">下载数据</button>
+				<button class="nav-button" onclick="uploadData()">恢复数据</button>
+				<input type="file" id="uploadFile" style="display:none" accept=".json" onchange="handleFileUpload()">
+				
+				<div id="logPanel" class="debug-info hidden"></div>
+			</div>
+		</div>
+
+        <!-- 任务详情页 -->
+        <div id="taskDetailView" class="hidden">
+            <div style="margin-bottom:20px;">
+                <button class="nav-button" onclick="hideTask()">← 返回</button>
+                <h2 style="margin-top:10px;" id="taskDate"></h2>
+            </div>
+            <div id="questionsContainer"></div>
+            <button id="submitBtn" class="nav-button" style="margin-top:20px;" onclick="submitAnswers()">提交答案</button>
+        </div>
+
+        <!-- 加载指示器 -->
+        <div id="loadingIndicator" class="loading-overlay hidden">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">正在加载题目...</div>
+        </div>
+    </div>
+
+    <script src="../utils.js?v=0.01"></script>
+    <script src="qac.js?v=0.01"></script>
+
+</body>
+</html>
